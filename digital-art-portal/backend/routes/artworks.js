@@ -5,7 +5,7 @@ const logger = require('../config/logger');
 
 const router = express.Router();
 
-router.get('/', async (req, res) => {
+router.get('/', authenticateToken, async (req, res) => {
   try {
     const filters = req.query;
     const artworks = await Artwork.findAll(filters);
@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', authenticateToken, async (req, res) => {
   try {
     const artwork = await Artwork.findById(req.params.id);
     if (!artwork) {

@@ -5,7 +5,7 @@ const logger = require('../config/logger');
 
 const router = express.Router();
 
-router.get('/artwork/:artworkId', async (req, res) => {
+router.get('/artwork/:artworkId', authenticateToken, async (req, res) => {
   try {
     const feedback = await Feedback.findByArtworkId(req.params.artworkId);
     res.json(feedback);
@@ -35,7 +35,7 @@ router.post('/', authenticateToken, async (req, res) => {
     };
 
     const feedback = await Feedback.create(feedbackData);
-    logger.info(`Feedback created for artwork ${artwork_id} by curator ${req.user.id}`);
+    logger.info(`Feedback created for artwork ${encodeURIComponent(artwork_id)} by curator ${encodeURIComponent(req.user.id)}`);
     res.status(201).json(feedback);
   } catch (error) {
     logger.error('Error creating feedback:', error);
@@ -52,7 +52,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
       return res.status(404).json({ error: 'Feedback not found' });
     }
     
-    logger.info(`Feedback updated: ${req.params.id}`);
+    logger.info(`Feedback updated: ${encodeURIComponent(req.params.id)}`);
     res.json(feedback);
   } catch (error) {
     logger.error('Error updating feedback:', error);
@@ -63,7 +63,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
 router.delete('/:id', authenticateToken, async (req, res) => {
   try {
     await Feedback.delete(req.params.id);
-    logger.info(`Feedback deleted: ${req.params.id}`);
+    logger.info(`Feedback deleted: ${encodeURIComponent(req.params.id)}`);
     res.json({ message: 'Feedback deleted successfully' });
   } catch (error) {
     logger.error('Error deleting feedback:', error);

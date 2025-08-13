@@ -169,6 +169,13 @@ export class ArtworkListComponent implements OnInit {
   showCreateForm = false;
   currentUser = this.authService.getCurrentUser();
   newArtwork = { title: '', description: '', image_url: '', tags: '' };
+  selectedArtwork: Artwork | null = null;
+  showViewModal = false;
+  showEditForm = false;
+  editArtworkData = { title: '', description: '', image_url: '', tags: '' };
+  showFeedbackFor: number | null = null;
+  artworkFeedback: { [key: number]: any[] } = {};
+  newFeedback = { rating: 5, comment: '' };
 
   constructor(
     private artworkService: ArtworkService,
@@ -208,11 +215,11 @@ export class ArtworkListComponent implements OnInit {
         this.loadArtworks();
         this.showCreateForm = false;
         this.newArtwork = { title: '', description: '', image_url: '', tags: '' };
-        alert('Artwork created successfully!');
+        console.log('Artwork created successfully!');
       },
       error: (error) => {
         console.error('Error creating artwork:', error);
-        alert('Error creating artwork: ' + (error.error?.error || error.message));
+        console.error('Error creating artwork:', error);
       }
     });
   }
@@ -220,14 +227,6 @@ export class ArtworkListComponent implements OnInit {
   canEdit(artwork: Artwork): boolean {
     return this.currentUser?.id === artwork.artist_id;
   }
-
-  selectedArtwork: Artwork | null = null;
-  showViewModal = false;
-  showEditForm = false;
-  editArtworkData = { title: '', description: '', image_url: '', tags: '' };
-  showFeedbackFor: number | null = null;
-  artworkFeedback: { [key: number]: any[] } = {};
-  newFeedback = { rating: 5, comment: '' };
 
   viewArtwork(artwork: Artwork): void {
     this.selectedArtwork = artwork;
@@ -259,11 +258,11 @@ export class ArtworkListComponent implements OnInit {
           this.loadArtworks();
           this.showEditForm = false;
           this.selectedArtwork = null;
-          alert('Artwork updated successfully!');
+          console.log('Artwork updated successfully!');
         },
         error: (error) => {
           console.error('Error updating artwork:', error);
-          alert('Error updating artwork: ' + (error.error?.error || error.message));
+          console.error('Error updating artwork:', error);
         }
       });
     } else {
@@ -300,9 +299,20 @@ export class ArtworkListComponent implements OnInit {
   }
 
   submitFeedback(artworkId: number): void {
+    // Validate feedback data
+    if (!this.newFeedback.comment.trim()) {
+      console.error('Comment is required');
+      return;
+    }
+    
+    if (this.newFeedback.rating < 1 || this.newFeedback.rating > 5) {
+      console.error('Rating must be between 1 and 5');
+      return;
+    }
+    
     const feedbackData = {
       artwork_id: artworkId,
-      comment: this.newFeedback.comment,
+      comment: this.newFeedback.comment.trim(),
       rating: this.newFeedback.rating
     };
 
@@ -310,11 +320,11 @@ export class ArtworkListComponent implements OnInit {
       next: () => {
         this.loadFeedback(artworkId);
         this.newFeedback = { rating: 5, comment: '' };
-        alert('Feedback submitted successfully!');
+        console.log('Feedback submitted successfully!');
       },
       error: (error) => {
         console.error('Error submitting feedback:', error);
-        alert('Error submitting feedback: ' + (error.error?.error || error.message));
+        console.error('Error submitting feedback:', error);
       }
     });
   }
@@ -324,11 +334,11 @@ export class ArtworkListComponent implements OnInit {
       this.artworkService.deleteArtwork(id).subscribe({
         next: () => {
           this.loadArtworks();
-          alert('Artwork deleted successfully!');
+          console.log('Artwork deleted successfully!');
         },
         error: (error) => {
           console.error('Error deleting artwork:', error);
-          alert('Error deleting artwork: ' + (error.error?.error || error.message));
+          console.error('Error deleting artwork:', error);
         }
       });
     }

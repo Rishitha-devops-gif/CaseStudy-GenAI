@@ -36,15 +36,18 @@ export class ArtworkService {
     if (filters?.tags) {
       params = params.set('tags', filters.tags);
     }
-    return this.http.get<Artwork[]>(this.apiUrl, { params });
+    return this.http.get<Artwork[]>(this.apiUrl, { params, headers: this.getHeaders() })
+      .pipe(catchError(this.handleAuthError.bind(this)));
   }
 
   getArtwork(id: number): Observable<Artwork> {
-    return this.http.get<Artwork>(`${this.apiUrl}/${id}`);
+    return this.http.get<Artwork>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() })
+      .pipe(catchError(this.handleAuthError.bind(this)));
   }
 
   createArtwork(artwork: ArtworkRequest): Observable<Artwork> {
-    return this.http.post<Artwork>(this.apiUrl, artwork, { headers: this.getHeaders() });
+    return this.http.post<Artwork>(this.apiUrl, artwork, { headers: this.getHeaders() })
+      .pipe(catchError(this.handleAuthError.bind(this)));
   }
 
   updateArtwork(id: number, artwork: ArtworkRequest): Observable<Artwork> {
@@ -53,6 +56,7 @@ export class ArtworkService {
   }
 
   deleteArtwork(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}`, { headers: this.getHeaders() });
+    return this.http.delete(`${this.apiUrl}/${id}`, { headers: this.getHeaders() })
+      .pipe(catchError(this.handleAuthError.bind(this)));
   }
 }

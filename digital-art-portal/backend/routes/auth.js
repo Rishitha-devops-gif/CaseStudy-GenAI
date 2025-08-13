@@ -20,7 +20,7 @@ router.post('/register', async (req, res) => {
     }
 
     const user = await User.create({ username, email, password, role });
-    logger.info(`User registered: ${email}`);
+    logger.info(`User registered: ${encodeURIComponent(email)}`);
     
     res.status(201).json({ message: 'User created successfully', user });
   } catch (error) {
@@ -53,7 +53,7 @@ router.post('/login', async (req, res) => {
       { expiresIn: '24h' }
     );
 
-    logger.info(`User logged in: ${email}`);
+    logger.info(`User logged in: ${encodeURIComponent(email)}`);
     res.json({ token, user: { id: user.id, username: user.username, email: user.email, role: user.role } });
   } catch (error) {
     logger.error('Login error:', error);
